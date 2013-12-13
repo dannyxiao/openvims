@@ -16,7 +16,7 @@ set incsearch
 set shiftwidth=4
 set autoindent
 set expandtab
-set mouse=n
+"set mouse=n
 
 syntax enable
 set background=dark
