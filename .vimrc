@@ -24,7 +24,7 @@ colorscheme solarized
 
 " tags settting
 set tags=tags;
-set autochdir
+" set autochdir
 
 let NERDTreeChristmasTree=1
 let NERDTreeMouseMode=2
@@ -59,3 +59,20 @@ let g:solarized_bold=1
 let g:solarized_diffmode="normal"
 let g:solarized_hitrail=0
 let g:solarized_menu=1
+
+
+
+nmap a& :Tabularize /&<CR>
+vmap a& :Tabularize /&<CR>
+nmap a= :Tabularize /=<CR>
+vmap a= :Tabularize /=<CR>
+nmap a: :Tabularize /:<CR>
+vmap a: :Tabularize /:<CR>
+nmap a:: :Tabularize /:\zs<CR>
+vmap a:: :Tabularize /:\zs<CR>
+nmap a, :Tabularize /,<CR>
+vmap a, :Tabularize /,<CR>
+nmap a,, :Tabularize /,\zs<CR>
+vmap a,, :Tabularize /,\zs<CR>
+nmap a<Bar> :Tabularize /<Bar><CR>
+vmap a<Bar> :Tabularize /<Bar><CR>
