@@ -8,6 +8,7 @@ endif
 call pathogen#infect()
 syntax on
 filetype plugin indent on
+filetype indent on
 
 set nu
 set tabstop=4
@@ -17,6 +18,28 @@ set shiftwidth=4
 set autoindent
 set expandtab
 "set mouse=n
+
+"禁止生成临时文件
+set noswapfile
+
+" 搜索时忽略大小写，但在有一个或以上大写字母时仍保持对大小写敏感
+set ignorecase smartcase
+
+" 状态行显示的内容（包括文件类型和解码）
+" set statusline=%F%m%r%h%w\ [FORMAT=%{&ff}]\ [TYPE=%Y]\ [POS=%l,%v][%p%%]\ %{strftime(\"%d/%m/%y\ -\ %H:%M\")}
+set statusline=[%F]%y%r%m%*%=[Line:%l/%L,Column:%c][%p%%]\ [%{strftime(\"%y/%m/%d\ -\ %H:%M\")}]
+set laststatus=2
+
+" 命令行（在状态行下）的高度，默认为1，这里是2
+set cmdheight=2
+
+" 光标移动到buffer的顶部和底部时保持3行距离
+set scrolloff=3
+
+set ruler " 打开状态栏标尺
+
+nmap J 5j  
+nmap K 5k  
 
 syntax enable
 set background=dark
@@ -62,17 +85,75 @@ let g:solarized_menu=1
 
 
 
-nmap a& :Tabularize /&<CR>
-vmap a& :Tabularize /&<CR>
+"nmap a& :Tabularize /&<CR>
+"vmap a& :Tabularize /&<CR>
 nmap a= :Tabularize /=<CR>
 vmap a= :Tabularize /=<CR>
-nmap a: :Tabularize /:<CR>
-vmap a: :Tabularize /:<CR>
-nmap a:: :Tabularize /:\zs<CR>
-vmap a:: :Tabularize /:\zs<CR>
-nmap a, :Tabularize /,<CR>
-vmap a, :Tabularize /,<CR>
-nmap a,, :Tabularize /,\zs<CR>
-vmap a,, :Tabularize /,\zs<CR>
-nmap a<Bar> :Tabularize /<Bar><CR>
-vmap a<Bar> :Tabularize /<Bar><CR>
+"nmap a: :Tabularize /:<CR>
+"vmap a: :Tabularize /:<CR>
+"nmap a:: :Tabularize /:\zs<CR>
+"vmap a:: :Tabularize /:\zs<CR>
+"nmap a, :Tabularize /,<CR>
+"vmap a, :Tabularize /,<CR>
+"nmap a,, :Tabularize /,\zs<CR>
+"vmap a,, :Tabularize /,\zs<CR>
+"nmap a<Bar> :Tabularize /<Bar><CR>
+"vmap a<Bar> :Tabularize /<Bar><CR>
+
+" auto pair { and ( with } and )
+imap {<CR> {<CR>}<ESC>O
+" 输入左中括号的时候自动补齐右中括号，并在括号中间输入i
+imap [ []<ESC>i
+" 输入左小括号的时候自动补齐右小括号，并在括号中间输入i
+imap ( ()<ESC>i
+
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"""""新文件标题
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"新建.c,.h,.sh,.java文件，自动插入文件头 
+autocmd BufNewFile *.cpp,*.[ch],*.sh,*.java exec ":call SetTitle()" 
+"定义函数SetTitle，自动插入文件头 
+func SetTitle() 
+    "如果文件类型为.sh文件 
+    if &filetype == 'sh' 
+        call setline(1, "##########################################################################") 
+        call append(line("."), "# File      Name: ".expand("%")) 
+        call append(line(".")+1, "# Author: Danny Xiao")      
+        call append(line(".")+2, "# mail: danny@o-in.me") 
+        call append(line(".")+3, "# Created Time: ".strftime("%c")) 
+        call append(line(".")+4, "#########################################################################") 
+        call append(line(".")+5, "#!/bin/zsh")
+        call append(line(".")+6, "PATH=/home/edison/bin:/home/edison/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/work/tools/gcc-3.4.5-glibc-2.3.6/bin")
+        call append(line(".")+7, "export PATH")
+        call append(line(".")+8, "")
+    else 
+        call setline(1, "/*************************************************************************") 
+        call append(line("."), "> File Name: ".expand("%")) 
+        call append(line(".")+1, "> Author: Danny Xiao") 
+        call append(line(".")+2, "> Mail: danny@o-in.me ") 
+        call append(line(".")+3, "> Created Time: ".strftime("%c")) 
+        call append(line(".")+4, " ************************************************************************/") 
+        call append(line(".")+5, "")
+    endif
+    if &filetype == 'cpp'
+        call append(line(".")+6, "#include <iostream>")
+        call append(line(".")+7, "using namespace std;")
+        call append(line(".")+8, "")
+    endif
+    if &filetype == 'c'
+        call append(line(".")+6, "#include <stdio.h>")
+        call append(line(".")+7, "")
+        call append(line(".")+8, "int main(int argc, char **argv)")
+        call append(line(".")+9, "(")
+        call append(line(".")+10, "    return 0;")
+        call append(line(".")+11, ")")
+    endif
+    if &filetype == 'java'
+        call append(line(".")+6,"public class ".expand("%"))
+        call append(line(".")+7,"call")
+    endif
+"新建文件后，自动定位到文件末尾
+autocmd BufNewFile * normal G
+endfunc 
