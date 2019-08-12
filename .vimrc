@@ -38,8 +38,8 @@ set scrolloff=3
 
 set ruler " 打开状态栏标尺
 
-nmap J 5j  
-nmap K 5k  
+" nmap J 5j  
+" nmap K 5k  
 
 syntax enable
 set background=dark
@@ -101,7 +101,7 @@ vmap a= :Tabularize /=<CR>
 "vmap a<Bar> :Tabularize /<Bar><CR>
 
 " auto pair { and ( with } and )
-imap {<CR> {<CR>}<ESC>O
+imap { {<CR>}<ESC>O
 " 输入左中括号的时候自动补齐右中括号，并在括号中间输入i
 imap [ []<ESC>i
 " 输入左小括号的时候自动补齐右小括号，并在括号中间输入i
@@ -157,3 +157,7 @@ func SetTitle()
 "新建文件后，自动定位到文件末尾
 autocmd BufNewFile * normal G
 endfunc 
+
+autocmd FileType c,cpp set shiftwidth=4 | set noexpandtab
+autocmd FileType java set shiftwidth=4 | set expandtab
+
