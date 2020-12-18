@@ -47,6 +47,7 @@ colorscheme solarized
 
 " tags settting
 set tags=tags;
+" set tags=tags;/
 " set autochdir
 
 let NERDTreeChristmasTree=1
@@ -107,13 +108,12 @@ imap [ []<ESC>i
 " 输入左小括号的时候自动补齐右小括号，并在括号中间输入i
 imap ( ()<ESC>i
 
-
-
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 """""新文件标题
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+filetype on
 "新建.c,.h,.sh,.java文件，自动插入文件头 
-autocmd BufNewFile *.cpp,*.[ch],*.sh,*.java exec ":call SetTitle()" 
+autocmd BufNewFile *.[ch],*.cpp,*.sh,*.java exec ":call SetTitle()" 
 "定义函数SetTitle，自动插入文件头 
 func SetTitle() 
     "如果文件类型为.sh文件 
@@ -121,34 +121,35 @@ func SetTitle()
         call setline(1, "##########################################################################") 
         call append(line("."), "# File      Name: ".expand("%")) 
         call append(line(".")+1, "# Author: Danny Xiao")      
-        call append(line(".")+2, "# mail: danny@o-in.me") 
+        call append(line(".")+2, "# mail: danny8303@gmail.com") 
         call append(line(".")+3, "# Created Time: ".strftime("%c")) 
         call append(line(".")+4, "#########################################################################") 
-        call append(line(".")+5, "#!/bin/zsh")
-        call append(line(".")+6, "PATH=/home/edison/bin:/home/edison/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/work/tools/gcc-3.4.5-glibc-2.3.6/bin")
-        call append(line(".")+7, "export PATH")
+        call append(line(".")+5, "#!/bin/bash")
         call append(line(".")+8, "")
     else 
         call setline(1, "/*************************************************************************") 
         call append(line("."), "> File Name: ".expand("%")) 
         call append(line(".")+1, "> Author: Danny Xiao") 
-        call append(line(".")+2, "> Mail: danny@o-in.me ") 
+        call append(line(".")+2, "> Mail: danny8303@gmail.com ") 
         call append(line(".")+3, "> Created Time: ".strftime("%c")) 
         call append(line(".")+4, " ************************************************************************/") 
         call append(line(".")+5, "")
     endif
-    if &filetype == 'cpp'
-        call append(line(".")+6, "#include <iostream>")
-        call append(line(".")+7, "using namespace std;")
-        call append(line(".")+8, "")
+    if &filetype == 'h'
+        call InsertHeadDefN()
     endif
     if &filetype == 'c'
         call append(line(".")+6, "#include <stdio.h>")
         call append(line(".")+7, "")
         call append(line(".")+8, "int main(int argc, char **argv)")
-        call append(line(".")+9, "(")
+        call append(line(".")+9, "{")
         call append(line(".")+10, "    return 0;")
-        call append(line(".")+11, ")")
+        call append(line(".")+11, "}")
+    endif
+    if &filetype == 'cpp'
+        call append(line(".")+6, "#include <iostream>")
+        call append(line(".")+7, "using namespace std;")
+        call append(line(".")+8, "")
     endif
     if &filetype == 'java'
         call append(line(".")+6,"public class ".expand("%"))
@@ -160,4 +161,47 @@ endfunc
 
 autocmd FileType c,cpp set shiftwidth=4 | set noexpandtab
 autocmd FileType java set shiftwidth=4 | set expandtab
+
+
+function InsertHeadDef(firstLine, lastLine)
+    if a:firstLine <1 || a:lastLine> line('$')
+        echoerr 'InsertHeadDef : Range overflow !(FirstLine:'.a:firstLine.';LastLine:'.a:lastLine.';ValidRange:1~'.line('$').')'
+        return ''
+    endif
+    let sourcefilename=expand("%:t")
+    let definename=substitute(sourcefilename,' ','','g')
+    let definename=substitute(definename,'\.','_','g')
+    let definename = toupper(definename)
+    exe 'normal '.a:firstLine.'GO'
+    call setline('.', '#ifndef _'.definename."_")
+    normal ==o
+    call setline('.', '#define _'.definename."_")
+    exe 'normal =='.(a:lastLine-a:firstLine+1).'jo'
+    call setline('.', '#endif')
+    let goLn = a:firstLine+2
+    exe 'normal =='.goLn.'G'
+endfunction
+function InsertHeadDefN()
+    let firstLine = 1
+    let lastLine = line('$')
+    let n=1
+    while n < 20
+        let line = getline(n)
+        if n==1
+            if line =~ '^\/\*.*$'
+                let n = n + 1
+                continue
+            else
+                break
+            endif
+        endif
+        if line =~ '^.*\*\/$'
+            let firstLine = n+1
+            break
+        endif
+        let n = n + 1
+    endwhile
+    call InsertHeadDef(firstLine, lastLine)
+endfunction
+nmap ,ha :call InsertHeadDefN()<CR>
 
